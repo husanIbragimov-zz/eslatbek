@@ -3,15 +3,15 @@ from django.contrib.auth.models import AbstractUser
 
 
 class BaseAbstractModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Yaratilgan sana')
-    updated_at = models.DateTimeField(auto_now=True, verbose_name='Yangilangan sana')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
 
 
-class User(AbstractUser):
-    phone_number = models.CharField(max_length=20, verbose_name='Telefon raqami', unique=True)
+class User(AbstractUser, BaseAbstractModel):
+    phone_number = models.CharField(max_length=20, unique=True, db_index=True)
 
     def __str__(self):
         return self.get_full_name()
@@ -24,9 +24,7 @@ User._meta.get_field('user_permissions').remote_field.related_name = 'user_permi
 class Target(BaseAbstractModel):
     PERIOD_CHOICES = (
         ('daily', 'Daily'),
-        ('weekly', 'Weekly'),
-        ('monthly', 'Monthly'),
-        ('yearly', 'Yearly')
+        ('weekly', 'Weekly')
     )
     name = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
