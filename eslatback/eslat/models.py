@@ -73,9 +73,12 @@ class ScheduleTable(BaseAbstractModel):
         Target, on_delete=models.CASCADE,
         null=True, blank=True,
         related_name='target_schedule')
+    title = models.CharField(max_length=50, null=True, blank=True)
     date = models.DateField(null=True, blank=True)
     time = models.TimeField(null=True, blank=True)
     is_done = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.target.name
+        if self.title:
+            return f"{self.title} - ({self.date})"
+        return f"{self.target.name} - ({self.date})"
