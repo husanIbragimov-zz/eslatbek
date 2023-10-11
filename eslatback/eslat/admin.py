@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BotUser, Target, DailyTarget
+from .models import BotUser, Target, DailyTarget, ScheduleTable
 
 
 class BotUserAdmin(admin.ModelAdmin):
@@ -9,13 +9,21 @@ class BotUserAdmin(admin.ModelAdmin):
     readonly_fields = ('updated_at', 'created_at')
 
 
+class ScheduleTableInline(admin.TabularInline):
+    model = ScheduleTable
+    extra = 0
+    readonly_fields = ('target', 'title', 'date', 'time', 'is_done')
+
+
 class TargetAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'period', 'user', 'is_active', 'created_at')
-    list_filter = ('weekday', 'is_active')
+    inlines = [ScheduleTableInline]
+    list_display = ('id', 'name', 'start_date', 'user', 'is_active', 'created_at')
+    list_filter = ('weekday', 'status', 'is_active')
+    filter_horizontal = ('weekday',)
     search_fields = ('name', 'description', 'user__username', 'user__first_name', 'user__last_name')
     readonly_fields = ('created_at', 'updated_at')
 
 
 admin.site.register(BotUser, BotUserAdmin)
 admin.site.register(Target, TargetAdmin)
-admin.site.register(DailyTarget)
+admin.site.register(ScheduleTable)
