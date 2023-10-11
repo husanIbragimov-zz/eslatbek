@@ -38,8 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # build-in app
+    # build-in apps
     'rest_framework',
+    'drf_yasg',
 
     # local app
     'eslat',
@@ -129,7 +130,7 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'eslatback/static'
+    BASE_DIR / 'static'
 ]
 
 MEDIA_URL = 'media/'
