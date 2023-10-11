@@ -95,6 +95,17 @@ class ScheduleTableViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mix
     def get_queryset(self):
         return ScheduleTable.objects.all()
 
+    def update(self, request, *args, **kwargs):
+        is_done = request.data.get('is_done')
+        if is_done:
+            is_done = True
+        else:
+            is_done = False
+        instance = self.get_object()
+        instance.is_done = is_done
+        instance.save()
+        return Response({'message': 'Schedule table updated'}, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=['get'])
     def current_day(self, request):
         queryset = ScheduleTable.objects.filter(date=datetime.now().date())
