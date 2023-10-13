@@ -135,7 +135,10 @@ async def next_month(call: types.CallbackQuery, state=FSMContext):
     await state.set_state("calendar_state")
     
     
-    
+@dp.callback_query_handler(text="ignore", state="*")
+async def ignore(call: types.CallbackQuery, state=FSMContext):
+    await call.answer(cache_time=1)
+    await call.answer()
 
 @dp.callback_query_handler(lambda callback_query: callback_query.data.startswith("select_day"), state="calendar_state")
 async def select_day(callback_query: types.CallbackQuery, state=FSMContext):
