@@ -12,6 +12,7 @@ class BaseAbstractModel(models.Model):
 
 class BotUser(BaseAbstractModel):
     full_name = models.CharField(max_length=150, null=True, blank=True)
+    nick_name = models.CharField(max_length=50, null=True, blank=True)
     username = models.CharField(
         max_length=50,
         null=True, blank=True,
@@ -68,17 +69,8 @@ class Target(BaseAbstractModel):
         return self.name
 
 
-class ScheduleTable(BaseAbstractModel):
+class FailPlan(models.Model):
     target = models.ForeignKey(
         Target, on_delete=models.CASCADE,
-        null=True, blank=True,
-        related_name='target_schedule')
-    title = models.CharField(max_length=50, null=True, blank=True)
-    date = models.DateField(null=True, blank=True)
-    time = models.TimeField(null=True, blank=True)
-    is_done = models.BooleanField(default=False)
-
-    def __str__(self):
-        if self.title:
-            return f"{self.title} - ({self.date})"
-        return f"{self.target.name} - ({self.date})"
+        null=True, blank=True, related_name='fail_plans')
+    name = models.CharField(max_length=150, null=True, blank=True)
