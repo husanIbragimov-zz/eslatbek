@@ -2,11 +2,10 @@ from rest_framework import serializers
 from ..models import BotUser, Target, DailyTarget, ScheduleTable
 
 
-class RegisterBotUserSerializer(serializers.ModelSerializer):
+class BotUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = BotUser
-        fields = ['telegram_id', 'username', 'full_name', 'age', 'phone_number']
-
+        fields = ['id', 'telegram_id', 'username', 'full_name', 'age', 'phone_number']
 
 class TargetSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,3 +29,11 @@ class ScheduleTableSerializer(serializers.ModelSerializer):
             'date': {'read_only': True},
             'time': {'read_only': True},
         }
+
+
+class BotUserTargetsSerializer(serializers.ModelSerializer):
+    user_targets = TargetSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = BotUser
+        fields = ['id', 'telegram_id', 'username', 'full_name', 'age', 'phone_number', 'user_targets']
