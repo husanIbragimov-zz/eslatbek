@@ -3,7 +3,7 @@ from aiogram.dispatcher.filters.builtin import CommandStart
 from aiogram.dispatcher import FSMContext
 from keyboards.default.defoult_btn import menu_btn
 from loader import dp, bot
-from data.api import create_user, get_me
+from data.api import create_user, get_me, get_my_targets, get_all_users
 
 
 
@@ -11,7 +11,7 @@ from data.api import create_user, get_me
 async def bot_start(message: types.Message, state=FSMContext):
     await message.answer(f"Assalomu alaykum, {message.from_user.full_name}!")
     user = get_me(message.from_user.id)
-    if user.status_code == 200:
+    if user:
         await message.answer("Ma'lumotlarimni o'zgartirish uchun /edit ni bosing", reply_markup=menu_btn)
     else:
         await message.answer("Ro'yxatdan o'tish uchun Ismingizni kiriting: ")
@@ -46,13 +46,25 @@ async def get_age(message: types.Message, state=FSMContext):
     
 @dp.message_handler(text="My Targets", state=None)
 async def my_targets(message: types.Message, state=FSMContext):
+    targets = get_my_targets(message.from_user.id)
+    if not targets:
+        await message.answer("Sizda hali targetlar yo'q")
+        return
+    tar = "My Targets:\n\n"
+    for i in targets:
+        tar += f"Nomi: {i['name']}\n"
+        tar += f"Tavsifi: {i['description']}\n"
+        tar += f"Boshlanish: {i['start_date']}\n"
+        tar += f"Tugash: {i['end_date']}\n"
+        tar += f"Status: {i['status']}\n\n"
+    await message.answer(tar, reply_markup=menu_btn)
+    await state.finish()
+    
+        
     await message.answer("My Targets")
     await state.finish()
     
-@dp.message_handler(text="Yangi target qo'shish", state=None)
-async def add_target(message: types.Message, state=FSMContext):
-    await message.answer("Yangi target qo'shish")
-    await state.finish()
+
     
 @dp.message_handler(text="Ma'lumotlarimni o'zgartirish", state=None)
 async def edit(message: types.Message, state=FSMContext):

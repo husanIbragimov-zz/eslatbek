@@ -8,11 +8,12 @@ create_user
 """
 
 
-def create_user(telegram_id, username, first_name, last_name, age, is_active):
+def create_user(telegram_id, username, full_name, nick_name, age, is_active):
     context = {
         "telegram_id": telegram_id,
         "username": username,
-        "full_name": f"{first_name} {last_name}",
+        "full_name": full_name,
+        "nick_name": nick_name,
         "age": age,
         "is_active": is_active
     }
@@ -47,11 +48,15 @@ create_target
 """
 
 
-def create_target(telegram_id, name, description, is_active):
+def create_target(telegram_id, name, description, is_active, weekday, time, start_date, end_date):
     context = {
         "user": telegram_id,
         "name": name,
         "description": description,
+        "weekday": weekday,
+        "time": time,
+        "start_date": start_date,
+        "end_date": end_date,        
         "is_active": is_active
     }
     response = requests.post(BASE_URL + 'targets/', data=context)
