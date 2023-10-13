@@ -1,10 +1,12 @@
 from datetime import timedelta, datetime
 
+from django.shortcuts import get_object_or_404
 from rest_framework import status, mixins, viewsets, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .serializers import RegisterBotUserSerializer, TargetSerializer, DailyTargetSerializer, ScheduleTableSerializer
+from .serializers import BotUserSerializer, TargetSerializer, DailyTargetSerializer, ScheduleTableSerializer, \
+    BotUserTargetsSerializer
 from ..models import BotUser, Target, ScheduleTable, DailyTarget
 
 
@@ -27,10 +29,34 @@ class RegisterViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.C
     """
     Register bot user
     """
-    serializer_class = RegisterBotUserSerializer
+    serializer_class = BotUserSerializer
+    lookup_field = 'telegram_id'
 
     def get_queryset(self):
         return BotUser.objects.all()
+
+    def retrieve(self, request, *args, **kwargs):
+        telegram_id = kwargs.get('telegram_id')
+        queryset = get_object_or_404(BotUser, telegram_id=telegram_id)
+        serializer = self.get_serializer(queryset)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['get'])
+    def targets(self, request, telegram_id=None):
+        queryset = get_object_or_404(BotUser, telegram_id=telegram_id)
+        serializer = BotUserTargetsSerializer(queryset)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    @action(detail=True, methods=['update'])
+    def target_status(self, request, telegram_id=None):
+        target_id = request.data.get('target_id')
+        is_done = request.data.get('is_done')
+        target = get_object_or_404(Target, id=target_id)
+        target.is_done = is_done
+        target.save()
+        return Response({'message': 'Target status updated'}, status=status.HTTP_200_OK)
+
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -65,20 +91,22 @@ class TargetViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             target = serializer.save()  # This will create the Target object
 
-            weekdays = find_weekday_between_dates(target.start_date, target.end_date,
-                                                  target.weekday.values_list('weekday', flat=True))
-            i = 1
-            for date in weekdays:
-                target_datetime = datetime.combine(date, target.time)  # Combine date and time
-                new_datetime = target_datetime - timedelta(hours=1)
-                new_time = new_datetime.time()
-                ScheduleTable.objects.create(
-                    target=target,
-                    title=f'{date.strftime("%A")} ({i})',
-                    date=date,
-                    time=new_time
-                )
-                i += 1
+            # weekdays = find_weekday_between_dates(target.start_date, target.end_date,
+            #                                       target.weekday.values_list('weekday', flat=True))
+            # print(weekdays)
+
+            # i = 1
+            # for date in weekdays:
+            #     target_datetime = datetime.combine(date, target.time)  # Combine date and time
+            #     new_datetime = target_datetime - timedelta(hours=1)
+            #     new_time = new_datetime.time()
+            #     ScheduleTable.objects.create(
+            #         target=target,
+            #         title=f'{date.strftime("%A")} ({i})',
+            #         date=date,
+            #         time=new_time
+            #     )
+            #     i += 1
 
             return Response({'message': 'Target created', 'id': target.id}, status=status.HTTP_201_CREATED)
 

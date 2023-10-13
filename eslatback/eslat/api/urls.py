@@ -4,8 +4,8 @@ from .views import RegisterViewSet, TargetViewSet, DailyTargetListView, Schedule
 
 router = DefaultRouter()
 
-router.register('user', RegisterViewSet, basename='user')
-router.register('target', TargetViewSet, basename='target')
+router.register('users', RegisterViewSet, basename='user')
+router.register('targets', TargetViewSet, basename='target')
 router.register('schedule', ScheduleTableViewSet, basename='schedule')
 
 urlpatterns = [
