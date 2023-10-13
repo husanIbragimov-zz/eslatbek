@@ -5,9 +5,9 @@ from rest_framework import status, mixins, viewsets, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .serializers import BotUserSerializer, TargetSerializer, DailyTargetSerializer, ScheduleTableSerializer, \
+from .serializers import BotUserSerializer, TargetSerializer, DailyTargetSerializer, \
     BotUserTargetsSerializer
-from ..models import BotUser, Target, ScheduleTable, DailyTarget
+from ..models import BotUser, Target, DailyTarget
 
 
 def find_weekday_between_dates(start_date, end_date, weekdays):
@@ -24,8 +24,8 @@ def find_weekday_between_dates(start_date, end_date, weekdays):
     return result
 
 
-class RegisterViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin,
-                      mixins.UpdateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+class BotUserViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin,
+                     mixins.UpdateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
     """
     Register bot user
     """
@@ -46,17 +46,17 @@ class RegisterViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.C
         queryset = get_object_or_404(BotUser, telegram_id=telegram_id)
         serializer = BotUserTargetsSerializer(queryset)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
 
-    @action(detail=True, methods=['update'])
-    def target_status(self, request, telegram_id=None):
-        target_id = request.data.get('target_id')
-        is_done = request.data.get('is_done')
-        target = get_object_or_404(Target, id=target_id)
-        target.is_done = is_done
-        target.save()
-        return Response({'message': 'Target status updated'}, status=status.HTTP_200_OK)
-
+    # @action(detail=True, methods=['patch'])
+    # def target(self, request, target_id, telegram_id):
+    #     target_id = self.kwargs['target_id']
+    #     telegram_id = self.kwargs['telegram_id']
+    #     is_done = request.data.get('is_done')
+    #     user = get_object_or_404(BotUser, telegram_id=telegram_id)
+    #     target = get_object_or_404(Target, id=target_id, user=user)
+    #     target.is_done = is_done
+    #     target.save()
+    #     return Response({'message': 'Target status updated'}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -91,52 +91,6 @@ class TargetViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             target = serializer.save()  # This will create the Target object
 
-            # weekdays = find_weekday_between_dates(target.start_date, target.end_date,
-            #                                       target.weekday.values_list('weekday', flat=True))
-            # print(weekdays)
-
-            # i = 1
-            # for date in weekdays:
-            #     target_datetime = datetime.combine(date, target.time)  # Combine date and time
-            #     new_datetime = target_datetime - timedelta(hours=1)
-            #     new_time = new_datetime.time()
-            #     ScheduleTable.objects.create(
-            #         target=target,
-            #         title=f'{date.strftime("%A")} ({i})',
-            #         date=date,
-            #         time=new_time
-            #     )
-            #     i += 1
-
             return Response({'message': 'Target created', 'id': target.id}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ScheduleTableViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin,
-                           mixins.UpdateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
-    """
-    Schedule table
-    """
-    serializer_class = ScheduleTableSerializer
-
-    def get_queryset(self):
-        return ScheduleTable.objects.all()
-
-    def update(self, request, *args, **kwargs):
-        is_done = request.data.get('is_done')
-        if is_done:
-            is_done = True
-        else:
-            is_done = False
-        instance = self.get_object()
-        instance.is_done = is_done
-        instance.save()
-        return Response({'message': 'Schedule table updated'}, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=['get'])
-    def current_day(self, request):
-        queryset = ScheduleTable.objects.filter(date=datetime.now().date())
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)

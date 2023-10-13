@@ -1,12 +1,11 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
-from .views import RegisterViewSet, TargetViewSet, DailyTargetListView, ScheduleTableViewSet
+from .views import BotUserViewSet, TargetViewSet, DailyTargetListView
 
 router = DefaultRouter()
 
-router.register('users', RegisterViewSet, basename='user')
+router.register('users', BotUserViewSet, basename='user')
 router.register('targets', TargetViewSet, basename='target')
-router.register('schedule', ScheduleTableViewSet, basename='schedule')
 
 urlpatterns = [
     path('weekdays/', DailyTargetListView.as_view(), name='weekdays'),
