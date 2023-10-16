@@ -4,10 +4,10 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status, mixins, viewsets, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
+from datetime import datetime, timedelta
 from .serializers import BotUserSerializer, TargetSerializer, DailyTargetSerializer, \
-    BotUserTargetsSerializer
-from ..models import BotUser, Target, DailyTarget
+    BotUserTargetsSerializer, FailPlanSerializer
+from ..models import BotUser, Target, DailyTarget, FailPlan
 
 
 def find_weekday_between_dates(start_date, end_date, weekdays):
@@ -47,17 +47,6 @@ class BotUserViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Cr
         serializer = BotUserTargetsSerializer(queryset)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # @action(detail=True, methods=['patch'])
-    # def target(self, request, target_id, telegram_id):
-    #     target_id = self.kwargs['target_id']
-    #     telegram_id = self.kwargs['telegram_id']
-    #     is_done = request.data.get('is_done')
-    #     user = get_object_or_404(BotUser, telegram_id=telegram_id)
-    #     target = get_object_or_404(Target, id=target_id, user=user)
-    #     target.is_done = is_done
-    #     target.save()
-    #     return Response({'message': 'Target status updated'}, status=status.HTTP_200_OK)
-
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -92,5 +81,39 @@ class TargetViewSet(viewsets.ModelViewSet):
             target = serializer.save()  # This will create the Target object
 
             return Response({'message': 'Target created', 'id': target.id}, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['get'])
+    def status(self, request, *args, **kwargs):
+        target_id = self.kwargs.get('pk')
+        target = get_object_or_404(Target, id=target_id)
+        if target.start_date >= datetime.now().date() and target.end_date >= datetime.now().date():
+            target.status = 'process'
+        elif target.end_date < datetime.now().date():
+            target.status = 'completed'
+            target.description = request.data.get('description')
+        else:
+            target.status = 'new'
+        target.save()
+        return Response({'message': 'Target status updated'}, status=status.HTTP_200_OK)
+
+
+class FailPlanViewSet(viewsets.ModelViewSet):
+    """
+    Fail plan
+    """
+    serializer_class = FailPlanSerializer
+
+    def get_queryset(self):
+        return FailPlan.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            fail_plan = serializer.save()  # This will create the FailPlan object
+
+            return Response({'message': 'Fail plan created', 'id': fail_plan.id}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
