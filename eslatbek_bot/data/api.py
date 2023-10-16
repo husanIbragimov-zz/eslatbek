@@ -81,12 +81,27 @@ def get_my_current_target(telegram_id):
 
 
 """
-update_my_target_status
+if target is failed then create fail plan model. If target is success then return success
 """
 
 
-def update_my_target_status(telegram_id, is_done):
-    context = {
-        'is_done': is_done
-    }
-    response = requests.patch(BASE_URL + f'')
+def target_success_or_fail(is_done, target_id, date):
+    if is_done:
+        return "Success"
+    else:
+        context = {
+            "target": target_id,
+            "name": date
+        }
+        response = requests.post(BASE_URL + f'fail-plans/', data=context)
+        return response.status_code
+
+
+"""
+Finally date is over then update target status
+"""
+
+
+def graduate(telegram_id):
+    pass
+
