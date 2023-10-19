@@ -159,3 +159,5 @@ migrations/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 /eslatbek_bot/.env
+migrations/
+staticfiles/
