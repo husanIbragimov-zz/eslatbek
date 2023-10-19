@@ -2,7 +2,7 @@ import datetime
 from aiogram import types
 from aiogram.dispatcher.filters.builtin import CommandStart
 from aiogram.dispatcher import FSMContext
-from eslatbek_bot.data.api import create_target
+from data.api import create_target
 from loader import dp, bot
 from keyboards.default.defoult_btn import menu_btn
 from keyboards.inline.inline_btn import get_target_btn, choose_weekday_btn, choose_hours_btn, get_calendar
@@ -11,7 +11,7 @@ from keyboards.inline.inline_btn import get_target_btn, choose_weekday_btn, choo
 
 @dp.message_handler(text="Yangi target qo'shish", state=None)
 async def add_target(message: types.Message, state=FSMContext):
-    await message.answer("Target nomini kiriting")
+    await message.answer("Target nomini kiriting", reply_markup=types.ReplyKeyboardRemove())
     await state.set_state("add_target")
     
 @dp.message_handler(state="add_target")
@@ -153,7 +153,7 @@ async def select_day(callback_query: types.CallbackQuery, state=FSMContext):
         "all_weekdays": False,
     }
     await state.update_data(checked=checked)
-    await callback_query.answer("O'zingizga qulay kunlarni belgilang", reply_markup=choose_weekday_btn(checked=checked))
+    await bot.send_message(callback_query.from_user.id, "O'zingizga qulay kunlarni belgilang", reply_markup= await choose_weekday_btn(checked=checked))
     await state.set_state("chose_weekdays")
     
 
@@ -168,7 +168,7 @@ async def weekdays(call: types.CallbackQuery, state=FSMContext):
     
     await state.update_data(checked=checked)
     
-    await call.message.edit_reply_markup(reply_markup=choose_weekday_btn(checked=checked))
+    await call.message.edit_reply_markup(reply_markup=await choose_weekday_btn(checked=checked))
     await call.answer(f"{call.data} tanlandi")
     await state.set_state("chose_weekdays")
     
@@ -202,7 +202,7 @@ async def all_weekdays(call: types.CallbackQuery, state=FSMContext):
         
     # await call.message.answer("Hafta kunini tanlang", reply_markup=choose_weekday_btn(checked=checked))
     await state.update_data(checked=checked)
-    await call.message.edit_reply_markup(reply_markup=choose_weekday_btn(checked=checked))
+    await call.message.edit_reply_markup(reply_markup=await choose_weekday_btn(checked=checked))
     await state.set_state("chose_weekdays")
     
 
@@ -233,7 +233,7 @@ async def choosen_hours(call: types.CallbackQuery, state=FSMContext):
     hours = data["hours"]
     checked = data["checked"]
     weekdays = []
-    i = []
+    i = list()
     z = 0
     for i in checked:
         z += 1

@@ -14,7 +14,7 @@ def get_target_btn(target_id):
     
     return target_btn
 
-def choose_weekday_btn(checked):
+async def choose_weekday_btn(checked):
     weekday_btn = InlineKeyboardMarkup(
         inline_keyboard=[
             [
