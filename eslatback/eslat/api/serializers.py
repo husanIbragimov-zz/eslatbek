@@ -1,3 +1,6 @@
+import datetime
+from datetime import datetime
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from ..models import BotUser, Target, DailyTarget, FailPlan
 
@@ -8,16 +11,31 @@ class BotUserSerializer(serializers.ModelSerializer):
         fields = ['id', 'telegram_id', 'username', 'full_name', 'nick_name', 'age', 'phone_number']
 
 
+class DailyTargetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DailyTarget
+        fields = ['id', 'weekday']
+
+
 class TargetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Target
         fields = ['id', 'status', 'name', 'start_date', 'end_date', 'weekday', 'time', 'user']
 
 
-class DailyTargetSerializer(serializers.ModelSerializer):
+class DailyTaskSerializer(serializers.ModelSerializer):
+    day = serializers.SerializerMethodField()
+    date = serializers.SerializerMethodField()
+
+    def get_date(self, obj):
+        return datetime.now().date()
+
+    def get_day(self, obj):
+        return datetime.now().strftime("%A").lower()
+
     class Meta:
-        model = DailyTarget
-        fields = ['id', 'weekday']
+        model = Target
+        fields = ['id', 'name', 'time', 'day', 'date']
 
 
 class BotUserTargetsSerializer(serializers.ModelSerializer):
