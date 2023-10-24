@@ -26,3 +26,9 @@ class BotUserTargetsSerializer(serializers.ModelSerializer):
     class Meta:
         model = BotUser
         fields = ['id', 'telegram_id', 'username', 'full_name', 'age', 'phone_number', 'user_targets']
+
+
+class FailPlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FailPlan
+        fields = ['id', 'target', 'name']

@@ -87,7 +87,7 @@ async def get_my_current_target(telegram_id):
 
 
 """
-update_my_target_status
+if target is failed then create fail plan model. If target is success then return success
 """
 
 
@@ -115,3 +115,23 @@ async def get_weekdays():
 # #### create target
 # a = create_target(telegram_id=1, name='test', description='test', is_active=True, weekday=[0,1,2], time='12:00', start_date='2021-09-01', end_date='2021-09-30')
 # print(a.text)
+
+def target_success_or_fail(is_done, target_id, date):
+    if is_done:
+        return "Success"
+    else:
+        context = {
+            "target": target_id,
+            "name": date
+        }
+        response = requests.post(BASE_URL + f'fail-plans/', data=context)
+        return response.status_code
+
+
+"""
+Finally date is over then update target status
+"""
+
+
+def graduate(telegram_id):
+    pass
