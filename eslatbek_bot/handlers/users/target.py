@@ -2,7 +2,7 @@ import datetime
 from aiogram import types
 from aiogram.dispatcher.filters.builtin import CommandStart
 from aiogram.dispatcher import FSMContext
-from data.api import create_target
+from data.api import create_target, get_weekdays
 from loader import dp, bot
 from keyboards.default.defoult_btn import menu_btn
 from keyboards.inline.inline_btn import get_target_btn, choose_weekday_btn, choose_hours_btn, get_calendar
@@ -79,6 +79,15 @@ async def select_day(callback_query: types.CallbackQuery, state=FSMContext):
     selected_year = int(data[4])
     
     selected_start_date = datetime.date(selected_year, selected_month, selected_day)
+    if selected_start_date < datetime.date.today():
+        await bot.send_message(callback_query.from_user.id, "Boshlanish sanasi bugundan oldin bo'lishi mumkin emas")
+            
+        year = datetime.datetime.now().year
+        month = datetime.datetime.now().month
+        await callback_query.message.answer("Targetni qachon boshlashini tanlang", reply_markup=get_calendar(year, month))
+        await state.update_data(month=month, year=year)
+        await state.set_state("start_date")
+        return
     
     await state.update_data(selected_start_date=selected_start_date)
 
@@ -134,8 +143,18 @@ async def select_day(callback_query: types.CallbackQuery, state=FSMContext):
     selected_day = int(data[2])
     selected_month = int(data[3])
     selected_year = int(data[4])
+    start_date_data = await state.get_data()
+    start_date = start_date_data["selected_start_date"] #2023-11-26
     
     selected_end_date = datetime.date(selected_year, selected_month, selected_day)
+    if selected_end_date < start_date + datetime.timedelta(days=7):
+        await bot.send_message(callback_query.from_user.id, "Targetni tugatish sanasi kamida 1 hafta bo'lishi kerak !")
+        year = datetime.datetime.now().year
+        month = datetime.datetime.now().month
+        await callback_query.message.answer("Targetni qachon tugatishingizni tanlang", reply_markup=get_calendar(year, month))
+        await state.update_data(month=month, year=year)
+        await state.set_state("end_date")
+        return
     
     await state.update_data(selected_end_date=selected_end_date)
 
@@ -262,7 +281,7 @@ async def choosen_hours(call: types.CallbackQuery, state=FSMContext):
     await call.message.answer(f"Target vaqti: {hours}")
     await call.message.answer(f"Target statusi: {is_active}")
     
-    await create_target(telegram_id=call.message.from_user.id,
+    s = await create_target(telegram_id=call.message.from_user.id,
                         name=target_name,
                         description=target_description,
                         start_date=selected_start_date,
@@ -270,6 +289,7 @@ async def choosen_hours(call: types.CallbackQuery, state=FSMContext):
                         weekday=l,
                         time=hours,
                         is_active=is_active)
+    print(s.text)
     await state.finish()
     await call.message.answer("Target qo'shildi", reply_markup=menu_btn)
     
