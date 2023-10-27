@@ -140,3 +140,7 @@ def graduate(telegram_id):
 # a = create_target(telegram_id=1, name='test', description='test', is_active=True, weekday=[0,1,2], time='12:00', start_date='2021-09-01', end_date='2021-09-30')
 # print(a.text)
 
+
+# # #### get my targets test is successfuly complate
+# a = get_my_targets(telegram_id=1)
+# print(a)
