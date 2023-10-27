@@ -251,26 +251,18 @@ async def choosen_hours(call: types.CallbackQuery, state=FSMContext):
     selected_end_date = data["selected_end_date"]
     hours = hours
     checked = data["checked"]
-    print(checked)
     weekdays = []
     l = list()
-    z = 0
-    # for i in checked[0:7]:
-    #     z += 1
-    #     if checked[i]:
-    #         l.append(z)
-    #         weekdays.append(i)
     for i in weeks:
         try:
             if checked[i]:
-                l.append(z)
                 weekdays.append(i)
         except:
             pass
-        z += 1
             
-            
+    db_week = await get_weekdays()
     weekdays = ", ".join(i for i in weekdays)
+    week_days = [i['id'] for i in db_week if i["weekday"] in weekdays]
     is_active = True
     await call.message.answer("Target qo'shildi")
     await call.message.answer(f"Target nomi: {target_name}")
@@ -281,15 +273,14 @@ async def choosen_hours(call: types.CallbackQuery, state=FSMContext):
     await call.message.answer(f"Target vaqti: {hours}")
     await call.message.answer(f"Target statusi: {is_active}")
     
-    s = await create_target(telegram_id=call.message.from_user.id,
+    s = await create_target(telegram_id=call.from_user.id,
                         name=target_name,
                         description=target_description,
                         start_date=selected_start_date,
                         end_date=selected_end_date,
-                        weekday=l,
+                        weekday=week_days,
                         time=hours,
                         is_active=is_active)
-    print(s.text)
     await state.finish()
     await call.message.answer("Target qo'shildi", reply_markup=menu_btn)
     

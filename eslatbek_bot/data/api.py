@@ -29,8 +29,8 @@ get_me
 
 async def get_me(telegram_id):
     response = requests.get(BASE_URL + f'users/{telegram_id}/')
-    data = json.loads(response.text)
-    return data
+    # data = json.loads(response.text)
+    return response.status_code
 
 
 """
@@ -104,18 +104,6 @@ async def get_weekdays():
     return data
 
 
-# print(get_weekdays())
-
-#### create user test is successfuly complate
-# a = create_user(telegram_id=123456789, username='test', full_name='test', nick_name='test', age=20, is_active=True, phone_number='123456789')
-# print(a.text)
-
-
-
-# #### create target
-# a = create_target(telegram_id=1, name='test', description='test', is_active=True, weekday=[0,1,2], time='12:00', start_date='2021-09-01', end_date='2021-09-30')
-# print(a.text)
-
 def target_success_or_fail(is_done, target_id, date):
     if is_done:
         return "Success"
@@ -135,3 +123,20 @@ Finally date is over then update target status
 
 def graduate(telegram_id):
     pass
+
+# print(get_weekdays())
+
+#### create user test is successfuly complate
+# a = create_user(telegram_id=123456789, username='test', full_name='test', nick_name='test', age=20, is_active=True, phone_number='123456789')
+# print(a.text)
+
+
+### get weekdays test is successfuly complate
+# a = get_weekdays()
+# print(a)
+
+
+# #### create target
+# a = create_target(telegram_id=1, name='test', description='test', is_active=True, weekday=[0,1,2], time='12:00', start_date='2021-09-01', end_date='2021-09-30')
+# print(a.text)
+

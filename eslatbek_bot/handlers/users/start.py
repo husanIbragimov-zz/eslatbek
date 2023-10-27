@@ -63,26 +63,6 @@ async def get_phone_number(message: types.Message, state=FSMContext):
     await message.answer("Ma'lumotlar saqlandi", reply_markup=menu_btn)
     await state.finish()
     
-@dp.message_handler(text="My Targets", state=None)
-async def my_targets(message: types.Message, state=FSMContext):
-    targets = await get_my_targets(message.from_user.id)
-    if not targets:
-        await message.answer("Sizda hali targetlar yo'q")
-        return
-    tar = "My Targets:\n\n"
-    for i in targets:
-        tar += f"Nomi: {i['name']}\n"
-        tar += f"Tavsifi: {i['description']}\n"
-        tar += f"Boshlanish: {i['start_date']}\n"
-        tar += f"Tugash: {i['end_date']}\n"
-        tar += f"Status: {i['status']}\n\n"
-    await message.answer(tar, reply_markup=menu_btn)
-    await state.finish()
-    
-        
-    await message.answer("My Targets")
-    await state.finish()
-    
 
     
 @dp.message_handler(text="Ma'lumotlarimni o'zgartirish", state=None)
