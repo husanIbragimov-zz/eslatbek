@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from datetime import datetime, timedelta
 from .serializers import BotUserSerializer, TargetSerializer, DailyTargetSerializer, \
-    BotUserTargetsSerializer, FailPlanSerializer
+    BotUserTargetsSerializer, FailPlanSerializer, DailyTaskSerializer
 from ..models import BotUser, Target, DailyTarget, FailPlan
 
 
@@ -71,6 +71,11 @@ class TargetViewSet(viewsets.ModelViewSet):
     """
     serializer_class = TargetSerializer
 
+    def get_serializer_class(self):
+        if self.action == 'timely_target':
+            return DailyTaskSerializer
+        return TargetSerializer
+
     def get_queryset(self):
         return Target.objects.all()
 
@@ -97,6 +102,16 @@ class TargetViewSet(viewsets.ModelViewSet):
             target.status = 'new'
         target.save()
         return Response({'message': 'Target status updated'}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def timely_target(self, request):
+        time_delta = datetime.now() + timedelta(hours=1)
+        print(time_delta)
+        targets = Target.objects.filter(time__hour=time_delta.hour)
+        sz = self.get_serializer(targets, many=True)
+
+        return Response(sz.data)
+
 
 
 class FailPlanViewSet(viewsets.ModelViewSet):
