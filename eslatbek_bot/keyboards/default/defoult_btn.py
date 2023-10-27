@@ -21,6 +21,14 @@ menu_btn = ReplyKeyboardMarkup(
     resize_keyboard=True, input_field_placeholder="Menu")
 
 
+phone_btn = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="Telefon raqamni yuborish", request_contact=True),
+        ],
+
+        ],
+    resize_keyboard=True, input_field_placeholder="Menu")
 
 def get_my_targets_btn(targets):
     my_targets_btn = ReplyKeyboardMarkup(row_width=1, resize_keyboard=True, input_field_placeholder="My Targets")
