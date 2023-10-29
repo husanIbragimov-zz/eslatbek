@@ -10,7 +10,7 @@ from data.api import create_user, get_me, get_my_targets, get_all_users
 @dp.message_handler(CommandStart())
 async def bot_start(message: types.Message, state=FSMContext):
     await message.answer(f"Assalomu alaykum, {message.from_user.full_name}!")
-    user = get_me(message.from_user.id)
+    user = await get_me(message.from_user.id)
     if user:
         await message.answer("Ma'lumotlarimni o'zgartirish uchun /edit ni bosing", reply_markup=menu_btn)
     else:
@@ -36,7 +36,7 @@ async def get_age(message: types.Message, state=FSMContext):
     nick_name = user.full_name 
     full_name = data["name"]
     is_active = True
-    create_user(telegram_id=message.from_user.id,
+    await create_user(telegram_id=message.from_user.id,
                 username=username,
                 nick_name=nick_name,
                 full_name=full_name,
@@ -46,7 +46,7 @@ async def get_age(message: types.Message, state=FSMContext):
     
 @dp.message_handler(text="My Targets", state=None)
 async def my_targets(message: types.Message, state=FSMContext):
-    targets = get_my_targets(message.from_user.id)
+    targets = await get_my_targets(message.from_user.id)
     if not targets:
         await message.answer("Sizda hali targetlar yo'q")
         return
