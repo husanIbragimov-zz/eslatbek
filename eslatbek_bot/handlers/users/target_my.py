@@ -8,7 +8,6 @@ from data.api import get_my_targets
 @dp.message_handler(text="My Targets")
 async def my_targets(message: types.Message, state=FSMContext):
     targets = await get_my_targets(message.from_user.id)
-    print(targets)
     if targets:
         await message.answer("Sizning Targetlariz: ", reply_markup=get_my_targets_btn(targets['user_targets']))
         await state.update_data(targets=targets['user_targets'])
@@ -34,7 +33,7 @@ async def my_targets(message: types.Message, state=FSMContext):
     for i in targets:
         if selected_target == i['name']:
             tar += f"Nomi: {i['name']}\n"
-            # tar += f"Tavsifi: {i['description']}\n"
+            tar += f"Tavsifi: {i['description']}\n"
             tar += f"Hafta kunlari: {', '.join(str(a) for a in i['weekday'])}\n"
             tar += f"Boshlanish: {i['start_date']}\n"
             tar += f"Tugash: {i['end_date']}\n"
