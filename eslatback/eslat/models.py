@@ -57,7 +57,7 @@ class Target(BaseAbstractModel):
     time = models.TimeField(null=True, blank=True)
     user = models.ForeignKey(
         BotUser, on_delete=models.CASCADE,
-        null=True, blank=True,
+        null=True, blank=True, to_field='telegram_id',
         related_name='user_targets')
     status = models.CharField(
         max_length=10,
