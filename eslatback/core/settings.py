@@ -9,28 +9,27 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^^w&m#0bb8z#x3b&bb0feya$+#9$4kqvj*d@6q7q8=5lf*@__e'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG")
 
-ALLOWED_HOSTS = ['*']
-
+ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
 
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -65,7 +64,6 @@ SWAGGER_SETTINGS = {
     # Other settings...
 }
 
-
 ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
@@ -86,17 +84,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# <=============================================== PostgresSQL ========================================================>
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('NAME'),
+        'USER': os.getenv('DBUSER'),
+        'PASSWORD': os.getenv('PASSWORD'),
+        'HOST': 'localhost',
+        'PORT': 5432,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -116,7 +124,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -128,21 +135,63 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR / 'static')
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'static'
-]
-
-MEDIA_URL = 'media/'
+MEDIA_URL = os.environ.get('MEDIA_URL', '/media/')
 MEDIA_ROOT = BASE_DIR / 'media'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Eslatbek Bot Admin",
+    "site_header": "Eslatbek Bot",
+    "site_brand": "Eslatbek Bot",
+    "login_logo": None,
+    "site_icon": "static/img/eslatbek.png",
+
+    "topmenu_links": [
+
+        # Url that gets reversed (Permissions can be added)
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+
+        # external url that opens in a new window (Permissions can be added)
+        {"name": "Support", "url": "https://t.me/husandev/", "new_window": True},
+
+        {"name": "Eslatbek Bot", "url": "https://t.me/eslatbek_bot", "new_window": True},
+
+    ],
+
+    "usermenu_links": [
+        {"name": "Support", "url": "https://t.me/husandev/", "new_window": True},
+    ],
+
+    # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
+
+    # Welcome text on the login screen
+    "welcome_sign": "ESLATBEK BOT ADMIN PANEL",
+
+    # Copyright on the footer
+    "copyright": "TRIUMF",
+
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+
+        "eslat": "fas fa-tasks",
+        "eslat.target": "fas fa-bullseye",
+        "eslat.daily_target": "fas fa-bullseye-arrow",
+        "eslat.target_schedule": "fas fa-calendar-alt",
+        "eslat.botuser": "fas fa-user-tie",
+
+    },
+
+}
