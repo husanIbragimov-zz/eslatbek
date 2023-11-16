@@ -26,6 +26,20 @@ DEBUG = os.getenv("DEBUG")
 
 ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
 
+CORS_ALLOW_ALL_ORIGINS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://eslatbek.husanibragimov.uz/',
+    'http://127.0.0.1',
+    'http://localhost',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    'https://eslatbek.husanibragimov.uz/',
+    'http://127.0.0.1',
+    'http://localhost',
+]
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -40,12 +54,14 @@ INSTALLED_APPS = [
     # build-in apps
     'rest_framework',
     'drf_yasg',
+    'corsheaders',
 
     # local app
     'eslat',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -143,7 +159,6 @@ STATIC_ROOT = os.path.join(BASE_DIR / 'static')
 
 MEDIA_URL = os.environ.get('MEDIA_URL', '/media/')
 MEDIA_ROOT = BASE_DIR / 'media'
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
