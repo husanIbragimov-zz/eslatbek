@@ -24,9 +24,9 @@ from rest_framework import permissions
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Eslat Bot API",
+        title="Eslatbek Bot API",
         default_version='api',
-        description="The Eslat API is helpful for you to manage your time and tasks. You can create your own targets and schedule them. Also, you can create your own daily targets and schedule them. You can find on telegram https://t.me/eslatbek_bot",
+        description="The Eslatbek Bot is helpful for you to manage your time and tasks. \nYou can create your own targets and schedule them. Also, you can create \nyour own daily targets and schedule them. You can find on telegram https://t.me/eslatbek_bot",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="lazy.devsloper@gmail.com"),
         license=openapi.License(name="BSD License"),
