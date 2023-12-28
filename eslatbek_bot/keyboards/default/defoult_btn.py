@@ -3,13 +3,13 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 menu_btn = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="My Targets"),
+            KeyboardButton(text="My Targets 📝"),
         ],
         [
-            KeyboardButton(text="Yangi target qo'shish"),
+            KeyboardButton(text="➕ Yangi target qo'shish"),
         ],
         [
-            KeyboardButton(text="Ma'lumotlarimni o'zgartirish"),
+            KeyboardButton(text="👤 Ma'lumotlarim"),
         ],
         [
             KeyboardButton(text="Foydali Linklar"),

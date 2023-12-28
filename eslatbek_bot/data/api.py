@@ -1,7 +1,8 @@
 import requests
 import json
 
-BASE_URL = 'http://127.0.0.1:8000/api/'
+BASE_URL = 'https://eslatbek.husanibragimov.uz/api/'
+# BASE_URL = 'http://127.0.0.1:8000/api/'
 
 """
 create_user
@@ -22,6 +23,19 @@ async def create_user(telegram_id, username, full_name, nick_name, phone_number,
     return response
 
 
+async def update_user_data(telegram_id, username, full_name, nick_name, phone_number, age):
+    context = {
+        "telegram_id": telegram_id,
+        "username": username,
+        "full_name": full_name,
+        "nick_name": nick_name,
+        "phone_number": phone_number,
+        "age": age,
+    }
+    response = requests.patch(BASE_URL + 'users/', data=context)
+    return response
+
+
 """
 get_me
 """
@@ -29,8 +43,8 @@ get_me
 
 async def get_me(telegram_id):
     response = requests.get(BASE_URL + f'users/{telegram_id}/')
-    # data = json.loads(response.text)
-    return response.status_code
+    data = json.loads(response.text)
+    return {'data': data, 'status_code': response.status_code}
 
 
 """
@@ -103,6 +117,9 @@ async def get_weekdays():
     data = json.loads(response.text)
     return data
 
+async def delete_target(target_id):
+    response = requests.delete(BASE_URL + f'targets/{target_id}/')
+    return response.text
 
 def target_success_or_fail(is_done, target_id, date):
     if is_done:
@@ -124,11 +141,24 @@ Finally date is over then update target status
 def graduate(telegram_id):
     pass
 
+
+async def get_scheduler_targets():
+    response = requests.get(BASE_URL + 'targets/timely_target/')
+    data = json.loads(response.text)
+    return data
+
+async def get_one_target(target_id):
+    response = requests.get(BASE_URL + f'targets/{target_id}/')
+    data = json.loads(response.text)
+    return data
+
+# print(get_one_target(7).get('user'))
+# print(get_scheduler_targets())
 # print(get_weekdays())
 
-#### create user test is successfuly complate
-# a = create_user(telegram_id=123456789, username='test', full_name='test', nick_name='test', age=20, is_active=True, phone_number='123456789')
-# print(a.text)
+### create user test is successfuly complate
+# a = create_user(telegram_id=12345678, username='test1', full_name='test', nick_name='test', age=20, is_active=True, phone_number='123456789')
+# print(a.status_code)
 
 ### get weekdays test is successfuly complate
 # a = get_weekdays()
@@ -142,4 +172,9 @@ def graduate(telegram_id):
 
 # # #### get my targets test is successfuly complate
 # a = get_my_targets(telegram_id=1)
+# print(a)
+
+
+### delete target test is successfuly complate
+# a = delete_target(target_id=7)
 # print(a)
