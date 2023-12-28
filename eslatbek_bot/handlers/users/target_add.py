@@ -8,9 +8,9 @@ from keyboards.default.defoult_btn import menu_btn
 from keyboards.inline.inline_btn import get_target_btn, choose_weekday_btn, choose_hours_btn, get_calendar
 
 
-@dp.message_handler(text="Yangi target qo'shish", state=None)
+@dp.message_handler(text="➕ Yangi target qo'shish", state=None)
 async def add_target(message: types.Message, state=FSMContext):
-    await message.answer("Target nomini kiriting", reply_markup=types.ReplyKeyboardRemove())
+    await message.answer("Maqsadingiz nomini kiriting", reply_markup=types.ReplyKeyboardRemove())
     await state.set_state("add_target")
 
 
@@ -19,7 +19,7 @@ async def add_target(message: types.Message, state=FSMContext):
     target_name = message.text
     await state.update_data(target_name=target_name)
     # await message.answer(f"{target_name} tanlandi")
-    await message.answer("Target haqida ma'lumot kiriting")
+    await message.answer("Maqsadingiz haqida ma'lumot kiriting")
     await state.set_state("target_description")
 
 
@@ -30,7 +30,7 @@ async def target_description(message: types.Message, state=FSMContext):
     # await message.answer(f"{target_description} tanlandi")
     year = datetime.datetime.now().year
     month = datetime.datetime.now().month
-    await message.answer("Targetni qachon boshlashini tanlang", reply_markup=get_calendar(year, month))
+    await message.answer("Ushbu maqsadga erishish uchun qachondan harakatni boshlamoqchisiz?", reply_markup=get_calendar(year, month))
     await state.update_data(month=month, year=year)
     await state.set_state("start_date")
 
@@ -88,18 +88,18 @@ async def select_day(callback_query: types.CallbackQuery, state=FSMContext):
             
         year = datetime.datetime.now().year
         month = datetime.datetime.now().month
-        await callback_query.message.answer("Targetni qachon boshlashini tanlang", reply_markup=get_calendar(year, month))
+        await callback_query.message.answer("Ushbu maqsadga erishish uchun qachondan harakatni boshlamoqchisiz?", reply_markup=get_calendar(year, month))
         await state.update_data(month=month, year=year)
         await state.set_state("start_date")
         return
     
     await state.update_data(selected_start_date=selected_start_date)
 
-    await bot.send_message(callback_query.from_user.id, f"Tanlangan kun: {selected_start_date}")
-    await callback_query.answer()
+    await bot.send_message(callback_query.from_user.id, f"Harakatni boshlash sanasi: {selected_start_date}")
+    # await callback_query.answer()
     year = datetime.datetime.now().year
     month = datetime.datetime.now().month
-    await callback_query.message.answer("Targetni qachon tugashini tanlang", reply_markup=get_calendar(year, month))
+    await callback_query.message.answer("Ushbu maqsadingizga qachongacha erishmoqchisiz?", reply_markup=get_calendar(year, month))
     await state.update_data(month=month, year=year)
     await state.set_state("end_date")
 
@@ -154,17 +154,17 @@ async def select_day(callback_query: types.CallbackQuery, state=FSMContext):
     
     selected_end_date = datetime.date(selected_year, selected_month, selected_day)
     if selected_end_date < start_date + datetime.timedelta(days=7):
-        await bot.send_message(callback_query.from_user.id, "Targetni tugatish sanasi kamida 1 hafta bo'lishi kerak !")
+        await bot.send_message(callback_query.from_user.id, "Tugatish sanasi kamida 1 hafta bo'lishi kerak !")
         year = datetime.datetime.now().year
         month = datetime.datetime.now().month
-        await callback_query.message.answer("Targetni qachon tugatishingizni tanlang", reply_markup=get_calendar(year, month))
+        await callback_query.message.answer("Tugash sanasini tanlang.", reply_markup=get_calendar(year, month))
         await state.update_data(month=month, year=year)
         await state.set_state("end_date")
         return
     
     await state.update_data(selected_end_date=selected_end_date)
 
-    await bot.send_message(callback_query.from_user.id, f"Tanlangan kun: {selected_end_date}")
+    await bot.send_message(callback_query.from_user.id, f"Tugash sanasi: {selected_end_date}")
     # await callback_query.answer()
 
     checked = {
@@ -237,7 +237,7 @@ async def all_weekdays(call: types.CallbackQuery, state=FSMContext):
 @dp.callback_query_handler(text="choosen_weekdays", state="chose_weekdays")
 async def choosen_weekdays(call: types.CallbackQuery, state=FSMContext):
     data = await state.get_data()
-    await call.message.answer(data)
+    # await call.message.answer(data)
     await call.message.delete()
     await call.answer(cache_time=1)
     await call.message.answer("O'zingizga qulay vaqtni belgilang: ", reply_markup=choose_hours_btn())
@@ -250,7 +250,7 @@ async def choosen_hours(call: types.CallbackQuery, state=FSMContext):
     hours = call.data
     # await state.update_data(hours=hours)
 
-    await call.message.answer(f"{hours} tanlandi")
+    await call.message.answer(f"Soat: {hours} tanlandi")
     await call.answer(cache_time=1)
 
     data = await state.get_data()
@@ -260,6 +260,7 @@ async def choosen_hours(call: types.CallbackQuery, state=FSMContext):
     selected_end_date = data["selected_end_date"]
     hours = hours
     checked = data["checked"]
+    print(checked)
     weekdays = []
     l = list()
     for i in weeks:
@@ -270,17 +271,22 @@ async def choosen_hours(call: types.CallbackQuery, state=FSMContext):
             pass
         
     db_week = await get_weekdays()
-    weekdays = ", ".join(i for i in weekdays)
+    print(weekdays)
+    print(db_week)
+    
+    # weekdays = ", ".join(i for i in weekdays)
     week_days = [i['id'] for i in db_week if i["weekday"] in weekdays]
+    print(week_days)
+    # print(weekdays)
     is_active = True
-    await call.message.answer("Target qo'shildi")
-    await call.message.answer(f"Target nomi: {target_name}")
-    await call.message.answer(f"Target tavsifi: {target_description}")
-    await call.message.answer(f"Target boshlanish sanasi: {selected_start_date}")
-    await call.message.answer(f"Target tugash sanasi: {selected_end_date}")
-    await call.message.answer(f"Target hafta kunlari: {weekdays}")
-    await call.message.answer(f"Target vaqti: {hours}")
-    await call.message.answer(f"Target statusi: {is_active}")
+    # await call.message.answer("Target qo'shildi")
+    # await call.message.answer(f"Target nomi: {target_name}")
+    # await call.message.answer(f"Target tavsifi: {target_description}")
+    # await call.message.answer(f"Target boshlanish sanasi: {selected_start_date}")
+    # await call.message.answer(f"Target tugash sanasi: {selected_end_date}")
+    # await call.message.answer(f"Target hafta kunlari: {weekdays}")
+    # await call.message.answer(f"Target vaqti: {hours}")
+    # await call.message.answer(f"Target statusi: {is_active}")
     
     s = await create_target(telegram_id=call.from_user.id,
                         name=target_name,
@@ -291,7 +297,8 @@ async def choosen_hours(call: types.CallbackQuery, state=FSMContext):
                         time=hours,
                         is_active=is_active)
     await state.finish()
-    await call.message.answer("Target qo'shildi", reply_markup=menu_btn)
+    print(s)
+    await call.message.answer("Maqsadlar ro'yxatiga qo'shildi ✅", reply_markup=menu_btn)
 
 
 
