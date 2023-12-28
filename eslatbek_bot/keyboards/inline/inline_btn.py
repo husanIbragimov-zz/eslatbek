@@ -122,10 +122,8 @@ def get_calendar(year, month):
                                     ]
                                     )
 
-   # Kalendar kunlarini yaratish
     current_date = datetime.date(year, month, 1)
 
-    # Oyning birinchi kunini aniqlash
     while current_date.weekday() != 0:
         current_date -= datetime.timedelta(days=1)
 
@@ -138,9 +136,35 @@ def get_calendar(year, month):
             callback_data = "ignore"
         keyboard.insert(InlineKeyboardButton(str(day), callback_data=callback_data))
         
-        # Har kun so'nggi kuniga o'tishi
         if current_date.weekday() == 6:
-            keyboard.row()  # Qatorni o'zgartirish
+            keyboard.row() 
         current_date += datetime.timedelta(days=1)
 
     return keyboard
+
+
+
+def target_delete_btn(target_id):
+    
+    target_btn = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="❌ O'chirish", callback_data=f"delete_{target_id}"),
+            ]        
+        ]
+    )
+    
+    return target_btn
+
+
+def view_progress_target_btn(target_id):
+    
+    target_btn = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="📈 Ko'rish", callback_data=f"view_progress_{target_id}"),
+            ]        
+        ]
+    )
+    
+    return target_btn
