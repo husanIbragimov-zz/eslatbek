@@ -141,6 +141,19 @@ Finally date is over then update target status
 def graduate(telegram_id):
     pass
 
+
+async def get_scheduler_targets():
+    response = requests.get(BASE_URL + 'targets/timely_target/')
+    data = json.loads(response.text)
+    return data
+
+async def get_one_target(target_id):
+    response = requests.get(BASE_URL + f'targets/{target_id}/')
+    data = json.loads(response.text)
+    return data
+
+# print(get_one_target(7).get('user'))
+# print(get_scheduler_targets())
 # print(get_weekdays())
 
 ### create user test is successfuly complate
