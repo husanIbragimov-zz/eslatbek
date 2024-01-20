@@ -19,3 +19,4 @@ class TargetAdmin(admin.ModelAdmin):
 
 admin.site.register(BotUser, BotUserAdmin)
 admin.site.register(Target, TargetAdmin)
+admin.site.register(DailyTarget)
