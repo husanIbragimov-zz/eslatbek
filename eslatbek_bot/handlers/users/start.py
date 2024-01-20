@@ -92,7 +92,7 @@ async def register(message: types.Message, state=FSMContext):
 async def links(message: types.Message, state=FSMContext):
     txt = """
     Bekorchilikdan yurgizib turadigan kanalim: @husandev
-    Sayt: https://husanibragimov.uz/
+    🌐 Sayt: husanibragimov.uz
     """
     await message.answer(txt)
     await state.finish()
